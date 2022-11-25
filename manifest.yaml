@@ -24,7 +24,7 @@ nodes:
   fixedcloudlets: 10
   extip: true
   displayName: Mastodon server
-  addons: [start-mastodon]
+  addons: [update-mastodon,mail-setup,s3-setup]
   volumes: ["/root/mastodon"]
 
 settings:
@@ -116,7 +116,7 @@ actions:
         docker-compose up -d
 
 addons:
-  - id: Update-mastodon
+  - id: update-mastodon
     name: Update Mastodon
     description: Pull updated docker containers and restart Mastodon.
     permanent: true
