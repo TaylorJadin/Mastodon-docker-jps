@@ -20,7 +20,7 @@ globals:
 nodes:
   nodeType: dockerengine
   nodeGroup: cp
-  cloudlets: 16
+  cloudlets: 32
   fixedcloudlets: 9
   extip: true
   displayName: Mastodon server
@@ -33,9 +33,9 @@ onInstall:
 actions:
   setup:      
     - cmd[cp]: |-
-        yum update -y > /tmp/yum_update.log
-        mkdir -p mastodon
-        cd mastodon
+        yum update -y
+        mkdir -p /root/mastodon
+        cd /root/mastodon
         docker pull lscr.io/linuxserver/mastodon
         SECRET_KEY_BASE=`docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
         OTP_SECRET=`docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
