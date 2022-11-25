@@ -40,10 +40,46 @@ settings:
         - caption: Domain Name
           type: string
           name: custom-domain-name
+  smtp:
+    fields:
+      - name: smtp-server
+        caption: SMTP Server
+        type: string
+        vtype: email
+      - name: smtp-port
+        caption: SMTP Port
+        type: string
+      - name: smtp-login
+        caption: SMTP Login
+        type: string
+      - name: smtp-password
+        caption: SMTP Password
+        type: string
+        inputtype: password
+      - name: smtp-from
+        caption: From Address
+        type: string
+  s3:
+    fields:
+      - name: s3-bucket
+        caption: S3 Bucket
+        type: string
+      - name: aws-access-key-id
+        caption: Username
+        type: string
+      - name: aws-secret-access-key
+        caption: Password
+        type: string
+        inputType: password
+      - name: s3-alias-host
+        caption: Host
+        type: string   
 
 onInstall:
   - setup
   - if (${settings.use-custom-domain:true}): setupCustomDomain
+  - start
+
 actions:
   setup:      
     - cmd[cp]: |-
@@ -74,26 +110,79 @@ actions:
         sed -i \
         -e "s|DOMAIN=|DOMAIN=${settings.custom-domain-name}|" \
         .env
+  start:
+    - cmd[cp]: |-
+        cd /root/mastodon
+        docker-compose up -d
 
 addons:
-  - id: start-mastodon
-    name: Start Mastodon
+  - id: Update-mastodon
+    name: Update Mastodon
     description: long description
-    permanent: false
+    permanent: true
     buttons:
       - confirmText: Are you sure you want to proceed?
-        loadingText: Starting Mastodon...
-        action: startMastodon
-        caption: Start
-        successText: Your Mastodon instance has been started!
-        title: Start Mastodon
+        loadingText: Upading Mastodon...
+        action: updateMastodon
+        caption: Update
+        successText: Your Mastodon instance has been updated!
+        title: Update Mastodon
     actions:
-      startMastodon:
+      updateMastodon:
         -  cmd[cp]: |-
             cd /root/mastodon
+            docker-compose pull
+            docker-compose down
             docker-compose up -d
+  - id: mail-setup
+    name: Mail Setup
+    description: Configure Mastodon's SMTP settings
+    permanent: true
+    buttons:
+      - confirmText: Are you sure you want to proceed?
+        loadingText: Changing Mastodon configuration...
+        action: smtpConfigure
+        caption: Configure
+        successText: Your Mastdon environment has been configured successfully!
+        settings: smtp
+        title: Please enter your SMTP details
+    actions:
+      smtpConfigure:
+        - cmd[cp]: |-
+            cd /root/mastodon
+            sed -i \
+            -e "s|SMTP_SERVER=.*|SMTP_SERVER=${settings.smtp-server}|" \
+            -e "s|SMTP_PORT=.*|SMTP_PORT=${settings.smtp-port}|" \
+            -e "s|SMTP_LOGIN=.*|SMTP_LOGIN=${settings.smtp-login}|" \
+            -e "s|SMTP_PASSWORD=.*|SMTP_PASSWORD=${settings.smtp-password}|" \
+            -e "s|SMTP_FROM_ADDRESS=.*|SMTP_FROM_ADDRESS=${settings.smtp-from}|" \
+            .env
+            docker-compose up -d --force-recreate
+  - id: s3-setup
+    name: S3 Setup
+    description: Configure S3 Storage
+    permanent: true
+    buttons:
+      - confirmText: Are you sure you want to proceed?
+        loadingText: Changing Mastodon configuration...
+        action: s3Configure
+        caption: Configure
+        successText: Your Mastdon environment has been configured successfully!
+        settings: s3
+        title: Please enter your S3 details
+    actions:
+      s3Configure:
+        - cmd[cp]: |-
+            cd /root/mastodon
+            sed -i \
+            -e "s|S3_ENABLED=.*|S3_ENABLED=true|" \
+            -e "s|S3_BUCKET=.*|S3_BUCKET=${settings.s3-bucket}|" \
+            -e "s|AWS_ACCESS_KEY_ID=.*|AWS_ACCESS_KEY_ID=${settings.aws-access-key-id}|" \
+            -e "s|AWS_SECRET_ACCESS_KEY=.*|AWS_SECRET_ACCESS_KEY=${settings.aws-secret-access-key}|" \
+            -e "s|S3_ALIAS_HOST=.*|S3_ALIAS_HOST=${settings.s3-alias-host}|" \
+            .env
+            docker-compose up -d --force-recreate
 
 success: | 
-  - Set up mastodon by editing the file at `/root/mastodon/.env`
-  - You will likely want to point a custom domain name. Get started by pointing an A record at **${nodes.cp.extIPs}**. Make sure to update `/root/mastodon.env` to include your new domain name.
-  - When your domain name is pointed and `/root/mastodon/.env` is all set, go to the Add-Ons for the Mastodon Server and use the **Start Mastodon** Add-On to start your instance.
+  - Set up SMTP for Mail and S3 for media storage using the add-ons for your Mastodon server node. 
+  - If you are mapping a custom domain, point an A record at **${nodes.cp.extIPs}**.
