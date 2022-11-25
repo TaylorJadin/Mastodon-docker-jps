@@ -6,42 +6,19 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=UTC
-      - LOCAL_DOMAIN=env-9221551.ca.reclaim.cloud
+      - LOCAL_DOMAIN=${DOMAIN}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - DB_HOST=db
-      - DB_USER=mastodon
-      - DB_NAME=mastodon
-      - DB_PASS=changethispass!
-      - DB_PORT=5432
-      - ES_ENABLED=false
-      - SECRET_KEY_BASE=435144f914c098805fd74bd2a7afc13613033ab39281dbda7f3d5f3e8a9e117c154c
-      - OTP_SECRET=bc4d21767112aec7514ce9052a83aad9c4baedd3c2410c880677db40f092de36330dc0cf6da536f2a19a73c2df6debc42e3199f0306932c52918b501c9412910
-      - VAPID_PRIVATE_KEY=PCNWuTXh_c6kbCKjh_fvaALne03KgXprFkg1mTsBLIU=
-      - VAPID_PUBLIC_KEY=BD0GvRmNcSep1blh713W0FzpHNbUCHpD9YF9sDDCu4vXfX174v09pDyy740Lxs_SEjLPlk-RQHPb9jlRJfX5wV0=
-      - SMTP_SERVER=mail.example.com
-      - SMTP_PORT=25
-      - SMTP_LOGIN=
-      - SMTP_PASSWORD=
-      - SMTP_FROM_ADDRESS=notifications@example.com
-      - S3_ENABLED=false
-      - WEB_DOMAIN=env-9221551.ca.reclaim.cloud #optional
-      - ES_HOST=es #optional
-      - ES_PORT=9200 #optional
-      - ES_USER=elastic #optional
-      - ES_PASS=elastic #optional
-      - S3_BUCKET= #optional
-      - AWS_ACCESS_KEY_ID= #optional
-      - AWS_SECRET_ACCESS_KEY= #optional
-      - S3_ALIAS_HOST= #optional
-      - VIRTUAL_HOST=env-9221551.ca.reclaim.cloud
-      - LETSENCRYPT_HOST=env-9221551.ca.reclaim.cloud
-      - LETSENCRYPT_EMAIL=jadin.taylor@gmail.com
+      - DB_HOST=${DATABASE_HOST}
+      - DB_USER=${DATABASE_USER}
+      - DB_NAME=${DATABASE_NAME}
+      - DB_PASS=${DATABASE_PASSWORD}
+      - DB_PORT=${DATABASE_PORT}
+      - WEB_DOMAIN=${DOMAIN}
+      - VIRTUAL_HOST=${DOMAIN}
+      - LETSENCRYPT_HOST=${DOMAIN}
     volumes:
-      - ./config:/config
-#    ports:
-#      - 80:80
-#      - 80:443
+      - ./mastodon:/config
     restart: unless-stopped
     depends_on:
       - db
@@ -52,9 +29,9 @@ services:
     volumes:
       - ./db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=mastodon
-      - POSTGRES_USER=mastodon
-      - POSTGRES_PASSWORD=changethispass!
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
     restart: unless-stopped
 
   redis:
