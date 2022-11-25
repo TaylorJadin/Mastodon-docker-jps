@@ -3,7 +3,7 @@ id: mastodon-docker
 version: '1.0'
 appVersion: latest
 name: Mastodon
-baseUrl: https://raw.githubusercontent.com/TaylorJadin/masotodon-docker-jps/master/
+baseUrl: https://raw.githubusercontent.com/TaylorJadin/masotodon-docker-jps/main/
 logo: /logo.png
 homepage: https://joinmastodon.org/
 
@@ -27,9 +27,23 @@ nodes:
   addons: [start-mastodon]
   volumes: ["/root/mastodon"]
 
+settings:
+  fields:  
+  - caption: Custom Domain
+    type: checkbox
+    name: use-custom-domain
+    value: true
+    disabled: false
+    tooltip: "If this option is disabled, Mastodon will be configured to use the environment URL as the domain name. Domain names cannot be changed after initial setup."
+    showIf:
+      true:
+        - caption: Domain Name
+          type: string
+          name: custom-domain-name
+
 onInstall:
   - setup
-
+  - if (${settings.use-custom-domain:true}): setupCustomDomain
 actions:
   setup:      
     - cmd[cp]: |-
@@ -54,6 +68,12 @@ actions:
         nodeGroup: cp
         path: /root/mastodon
         keyword: mastodon
+  setupCustomDomain:
+    - cmd[cp]: |-
+        cd /root/mastodon
+        sed -i \
+        -e "s|DOMAIN=|DOMAIN=${settings.custom-domain-name}|" \
+        .env
 
 addons:
   - id: start-mastodon

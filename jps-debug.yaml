@@ -4,23 +4,37 @@ name: jps debug
 targetNodes:
   nodeGroup: '*'
 
+settings:
+  fields:  
+  - caption: Custom Domain
+    type: checkbox
+    name: use-custom-domain
+    value: true
+    disabled: false
+    tooltip: "If this option is disabled, Mastodon will be configured to use the environment URL as the domain name. Domain names cannot be changed after initial setup."
+    showIf:
+      true:
+        - caption: Domain Name
+          type: string
+          name: custom-domain-name
+
 onInstall:
-  - cmd[${targetNodes.nodeGroup}]: |-
-      yum update -y
-      mkdir -p /root/mastodon
-      cd /root/mastodon
-      docker pull lscr.io/linuxserver/mastodon
-      SECRET_KEY_BASE=`docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
-      OTP_SECRET=`docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
-      wget https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main/docker-compose.yml
-      wget https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main/.env
-      sed -i \
-      -e "s|DOMAIN=|DOMAIN=${env.domain}|" \
-      -e "s|LETSENCRYPT_EMAIL=|LETSENCRYPT_EMAIL=${user.email}|" \
-      -e "s|DATABASE_PASSWORD=|DATABASE_PASSWORD=${globals.dbPass}|" \
-      -e "s|SECRET_KEY_BASE=|SECRET_KEY_BASE=$SECRET_KEY_BASE|" \
-      -e "s|OTP_SECRET=|OTP_SECRET=$OTP_SECRET|" \
-      -e "/VAPID/d" \
-      .env
-      docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon mastodon:webpush:generate_vapid_key >> .env
-    user: root
+  # - cmd[${targetNodes.nodeGroup}]: |-
+  #     yum update -y
+  #     mkdir -p /root/mastodon
+  #     cd /root/mastodon
+  #     docker pull lscr.io/linuxserver/mastodon
+  #     SECRET_KEY_BASE=`docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
+  #     OTP_SECRET=`docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
+  #     wget https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main/docker-compose.yml
+  #     wget https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main/.env
+  #     sed -i \
+  #     -e "s|DOMAIN=|DOMAIN=${env.domain}|" \
+  #     -e "s|LETSENCRYPT_EMAIL=|LETSENCRYPT_EMAIL=${user.email}|" \
+  #     -e "s|DATABASE_PASSWORD=|DATABASE_PASSWORD=${globals.dbPass}|" \
+  #     -e "s|SECRET_KEY_BASE=|SECRET_KEY_BASE=$SECRET_KEY_BASE|" \
+  #     -e "s|OTP_SECRET=|OTP_SECRET=$OTP_SECRET|" \
+  #     -e "/VAPID/d" \
+  #     .env
+  #     docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon mastodon:webpush:generate_vapid_key >> .env
+    # user: root
