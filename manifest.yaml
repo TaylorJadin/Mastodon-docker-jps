@@ -4,7 +4,7 @@ version: '1.0'
 appVersion: latest
 name: Mastodon
 baseUrl: https://raw.githubusercontent.com/TaylorJadin/masotodon-docker-jps/main/
-logo: /logo.png
+logo: /mastodon-logo.png
 homepage: https://joinmastodon.org/
 
 categories: 
