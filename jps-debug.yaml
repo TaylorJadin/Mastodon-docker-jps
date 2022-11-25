@@ -4,21 +4,22 @@ name: jps debug
 targetNodes:
   nodeGroup: '*'
 
-# settings:
-#   fields:
-#     - name: bucket
-#       caption: S3 Bucket
-#       type: string
-#     - name: aws-access-key-id
-#       caption: Username
-#       type: string
-#     - name: aws-secret-access-key
-#       caption: Password
-#       type: string
-#       inputType: password
-#     - name: s3-alias-host
-#       caption: Host
-#       type: string   
+settings:
+  fields:
+    - name: user-name
+      caption: Username
+      type: string
+    - name: user-email
+      caption: Email
+      type: string
+      vtype: email
+    - name: user-role
+      caption: Custom Role
+      type: list
+      values:
+        Owner: Owner
+        Admin: Admin
+        Moderator: Moderator
 
 # onInstall:
 #   - cmd[${targetNodes.nodeGroup}]: |-

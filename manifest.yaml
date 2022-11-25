@@ -24,7 +24,7 @@ nodes:
   fixedcloudlets: 10
   extip: true
   displayName: Mastodon server
-  addons: [update-mastodon,mail-setup,s3-setup]
+  addons: [update-mastodon,mail-setup,s3-setup,create-user]
   volumes: ["/root/mastodon"]
 
 settings:
@@ -74,6 +74,23 @@ settings:
       - name: s3-alias-host
         caption: Host
         type: string   
+  user:
+    fields:
+      - name: user-name
+        caption: Username
+        type: string
+      - name: user-email
+        caption: Email
+        type: string
+        vtype: email
+      - name: user-role
+        caption: Custom Role
+        type: list
+        values:
+          Owner: Owner
+          Admin: Admin
+          Moderator: Moderator
+
 
 onInstall:
   - setup
@@ -183,7 +200,23 @@ addons:
             -e "s|S3_ALIAS_HOST=.*|S3_ALIAS_HOST=${settings.s3-alias-host}|" \
             .env
             docker-compose up -d --force-recreate
+  - id: create-user
+    name: Create User
+    description: Create a user via tootctl.
+    permanent: true
+    buttons:
+      - confirmText: Are you sure you want to proceed?
+        loadingText: Creating User...
+        action: Create
+        caption: Create
+        successText: Your Mastodon instance has been updated!
+        settings: user
+        title: Create User
+    actions:
+      createuser:
+        -  cmd[cp]: |-
+            TEMP_PASSWORD=`tootctl accounts create ${settings.user-name} --email=${settings.user-email} --confirmed --role ${settings.user-role} | awk '{ print $3 }'`
 
 success: | 
-  - Set up SMTP for Mail and S3 for media storage using the add-ons for your Mastodon server node. 
+  - Set up an owner account, configure SMTP for Mail, and set up S3 for media storage using the add-ons for your Mastodon server node. 
   - If you are mapping a custom domain, point an A record at **${nodes.cp.extIPs}**.
