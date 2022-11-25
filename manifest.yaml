@@ -122,7 +122,7 @@ addons:
     permanent: true
     buttons:
       - confirmText: Are you sure you want to proceed?
-        loadingText: Upading Mastodon...
+        loadingText: Updating Mastodon...
         action: updateMastodon
         caption: Update
         successText: Your Mastodon instance has been updated!
