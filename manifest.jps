@@ -4,7 +4,7 @@ version: '1.0'
 appVersion: latest
 name: Mastodon
 baseUrl: https://raw.githubusercontent.com/TaylorJadin/masotodon-docker-jps/master/
-logo: /mastodon-logo.png
+logo: /logo.png
 homepage: https://joinmastodon.org/
 
 categories: 
@@ -36,23 +36,30 @@ actions:
         yum update -y
         mkdir -p mastodon
         cd mastodon
+        docker pull lscr.io/linuxserver/mastodon
+        SECRET_KEY_BASE=`docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
+        OTP_SECRET=`docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
         wget https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main/docker-compose.yml
         wget https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main/.env
         sed -i \
-        -e "s|##DOMAIN##|${env.domain}|g" \
-        -e "s|##EMAIL##|${user.email}|g" \
-        -e "s|##DBPASS##|${globals.dbPass}|g" \
-        -e "s|##ROOTDBPASS##|${fn.password}|g" \
+        -e "s|DOMAIN=|DOMAIN=${env.domain}|" \
+        -e "s|LETSENCRYPT_EMAIL=|LETSENCRYPT_EMAIL=${user.email}|" \
+        -e "s|DATABASE_PASSWORD=|DATABASE_PASSWORD=${globals.dbPass}|" \
+        -e "s|SECRET_KEY_BASE=|SECRET_KEY_BASE=$SECRET_KEY_BASE|" \
+        -e "s|OTP_SECRET=|OTP_SECRET=$OTP_SECRET|" \
+        -e "/VAPID/d" \
         .env
+        docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon mastodon:webpush:generate_vapid_key >> .env
     - env.file.AddFavorite:
         nodeGroup: cp
         path: /root/mastodon
         keyword: mastodon
-    
+
+addons:
   - id: start-mastodon
     name: Start Mastodon
     description: long description
-    permanent: true
+    permanent: false
     buttons:
       - confirmText: Are you sure you want to proceed?
         loadingText: Starting Mastodon...
@@ -64,11 +71,9 @@ actions:
       startMastodon:
         -  cmd[cp]: |-
             cd /root/mastodon
-            docker-compose pull
-            docker-compose down
-            docker-compose up -d --force-recreate
+            docker-compose up -d
 
 success: | 
-  - Set up Ghost by editing the .env file, then using the Start Mastodon addon.
-  - You will likely want to point a domain name, point an A record at **${nodes.cp.extIPs}**
-  - Further information on setting up Mastodon can be found at [support.reclaimhosting.com](https://support.reclaimhosting.com)
+  - Set up mastodon by editing the file at `/root/mastodon/.env`
+  - You will likely want to point a custom domain name. Get started by pointing an A record at **${nodes.cp.extIPs}**. Make sure to update `/root/mastodon.env` to include your new domain name.
+  - When your domain name is pointed and `/root/mastodon/.env` is all set, go to the Add-Ons for the Mastodon Server and use the **Start Mastodon** Add-On to start your instance.
