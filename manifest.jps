@@ -33,7 +33,7 @@ onInstall:
 actions:
   setup:      
     - cmd[cp]: |-
-        yum update -y
+        yum update -y > /tmp/yum_update.log
         mkdir -p mastodon
         cd mastodon
         docker pull lscr.io/linuxserver/mastodon
