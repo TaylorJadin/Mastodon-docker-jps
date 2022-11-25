@@ -37,8 +37,8 @@ actions:
         mkdir -p /root/mastodon
         cd /root/mastodon
         docker pull lscr.io/linuxserver/mastodon
-        SECRET_KEY_BASE=`docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
-        OTP_SECRET=`docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
+        SECRET_KEY_BASE=`docker run --rm -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
+        OTP_SECRET=`docker run --rm -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon secret`
         wget https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main/docker-compose.yml
         wget https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main/.env
         sed -i \
@@ -49,7 +49,7 @@ actions:
         -e "s|OTP_SECRET=|OTP_SECRET=$OTP_SECRET|" \
         -e "/VAPID/d" \
         .env
-        docker run --rm -it -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon mastodon:webpush:generate_vapid_key >> .env
+        docker run --rm -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon mastodon:webpush:generate_vapid_key >> .env
     - env.file.AddFavorite:
         nodeGroup: cp
         path: /root/mastodon
