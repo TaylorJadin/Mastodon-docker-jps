@@ -2,6 +2,7 @@ version: '2'
 services:
   mastodon:
     image: lscr.io/linuxserver/mastodon
+    container_name: mastodon
     environment:
       - PUID=1000
       - PGID=1000
@@ -46,7 +47,8 @@ services:
       - redis
 
   db:
-    image: postgres:14
+    image: postgres:14-alpine
+    container_name: postgres
     volumes:
       - ./db:/var/lib/postgresql/data
     environment:
@@ -56,11 +58,13 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis
+    image: redis-alpine
+    container_name: redis
     restart: unless-stopped
 
   nginx-proxy:
     image: nginxproxy/nginx-proxy
+    container_name: nginx-proxy-alpine
     volumes: 
       - certs:/etc/nginx/certs:ro
       - /etc/nginx/vhost.d
@@ -75,6 +79,7 @@ services:
 
   letsencrypt:
     image: nginxproxy/acme-companion
+    container_name: letsencrypt
     volumes:
       - certs:/etc/nginx/certs
       - /var/run/docker.sock:/var/run/docker.sock:ro
