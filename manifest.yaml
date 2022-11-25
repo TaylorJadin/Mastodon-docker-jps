@@ -11,8 +11,8 @@ categories:
 - apps/education
 
 description: 
-  text: long description
-  short: short descrip
+  text: "Mastodon is a free, open-source social network server based on ActivityPub where users can follow friends and discover new ones. On Mastodon, users can publish anything they want: links, pictures, text, video. All Mastodon servers are interoperable as a federated network (users on one server can seamlessly communicate with users from another one, including non-Mastodon software that implements ActivityPub)!"
+  short: Free, open-source decentralized social media platform.
 
 globals:
   dbPass: ${fn.password}
@@ -118,7 +118,7 @@ actions:
 addons:
   - id: Update-mastodon
     name: Update Mastodon
-    description: long description
+    description: Pull updated docker containers and restart Mastodon.
     permanent: true
     buttons:
       - confirmText: Are you sure you want to proceed?
