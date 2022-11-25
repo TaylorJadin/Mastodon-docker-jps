@@ -1,0 +1,74 @@
+type: install
+id: mastodon-docker
+version: '1.0'
+appVersion: latest
+name: Mastodon
+baseUrl: https://raw.githubusercontent.com/TaylorJadin/masotodon-docker-jps/master/
+logo: /mastodon-logo.png
+homepage: https://joinmastodon.org/
+
+categories: 
+- apps/education
+
+description: 
+  text: long description
+  short: short descrip
+
+globals:
+  dbPass: ${fn.password}
+
+nodes:
+  nodeType: dockerengine
+  nodeGroup: cp
+  cloudlets: 16
+  fixedcloudlets: 9
+  extip: true
+  displayName: Mastodon server
+  addons: [start-mastodon]
+  volumes: ["/root/mastodon"]
+
+onInstall:
+  - setup
+
+actions:
+  setup:      
+    - cmd[cp]: |-
+        yum update -y
+        mkdir -p mastodon
+        cd mastodon
+        wget https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main/docker-compose.yml
+        wget https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main/.env
+        sed -i \
+        -e "s|##DOMAIN##|${env.domain}|g" \
+        -e "s|##EMAIL##|${user.email}|g" \
+        -e "s|##DBPASS##|${globals.dbPass}|g" \
+        -e "s|##ROOTDBPASS##|${fn.password}|g" \
+        .env
+    - env.file.AddFavorite:
+        nodeGroup: cp
+        path: /root/mastodon
+        keyword: mastodon
+    
+  - id: start-mastodon
+    name: Start Mastodon
+    description: long description
+    permanent: true
+    buttons:
+      - confirmText: Are you sure you want to proceed?
+        loadingText: Starting Mastodon...
+        action: startMastodon
+        caption: Start
+        successText: Your Mastodon instance has been started!
+        title: Start Mastodon
+    actions:
+      startMastodon:
+        -  cmd[cp]: |-
+            cd /root/mastodon
+            docker-compose pull
+            docker-compose down
+            docker-compose up -d --force-recreate
+
+success: | 
+  - Set up Ghost by editing the .env file, then using the Start Mastodon addon.
+  - You will likely want to point a domain name, point an A record at **${nodes.cp.extIPs}**
+  - Further information on setting up Mastodon can be found at [support.reclaimhosting.com](https://support.reclaimhosting.com)
