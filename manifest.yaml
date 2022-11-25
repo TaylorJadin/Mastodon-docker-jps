@@ -21,7 +21,7 @@ nodes:
   nodeType: dockerengine
   nodeGroup: cp
   cloudlets: 32
-  fixedcloudlets: 9
+  fixedcloudlets: 10
   extip: true
   displayName: Mastodon server
   addons: [start-mastodon]
