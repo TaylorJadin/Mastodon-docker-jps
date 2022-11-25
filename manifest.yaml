@@ -34,7 +34,7 @@ settings:
     name: use-custom-domain
     value: true
     disabled: false
-    tooltip: "If this option is disabled, Mastodon will be configured to use the environment URL as the domain name. Domain names cannot be changed after initial setup."
+    tooltip: "If this option is disabled, Mastodon will be configured to use the environment URL for its domain name. Mastodon does not recommend changing domain names after setup."
     showIf:
       true:
         - caption: Domain Name
