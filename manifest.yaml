@@ -126,7 +126,7 @@ actions:
     - cmd[cp]: |-
         cd /root/mastodon
         sed -i \
-        -e "s|DOMAIN=|DOMAIN=${settings.custom-domain-name}|" \
+        -e "s|DOMAIN=.*|DOMAIN=${settings.custom-domain-name}|" \
         .env
   start:
     - cmd[cp]: |-
