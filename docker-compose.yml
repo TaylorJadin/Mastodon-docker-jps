@@ -67,7 +67,7 @@ services:
     restart: unless-stopped
 
   nginx-proxy:
-    image: nginxproxy/nginx-proxy
+    build: .
     container_name: nginx
     volumes: 
       - certs:/etc/nginx/certs:ro
