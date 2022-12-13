@@ -24,7 +24,6 @@ nodes:
   fixedcloudlets: 10
   extip: true
   displayName: Mastodon server
-  addons: [update-mastodon,mail-setup,s3-setup,create-user]
   volumes: ["/root/mastodon"]
 
 settings:
@@ -40,57 +39,6 @@ settings:
         - caption: Domain Name
           type: string
           name: custom-domain-name
-  smtp:
-    fields:
-      - name: smtp-server
-        caption: SMTP Server
-        type: string
-      - name: smtp-port
-        caption: SMTP Port
-        type: string
-      - name: smtp-login
-        caption: SMTP Login
-        type: string
-      - name: smtp-password
-        caption: SMTP Password
-        type: string
-        inputtype: password
-      - name: smtp-from
-        caption: From Address
-        type: string
-        vtype: email
-  s3:
-    fields:
-      - name: s3-bucket
-        caption: S3 Bucket
-        type: string
-      - name: aws-access-key-id
-        caption: Username
-        type: string
-      - name: aws-secret-access-key
-        caption: Password
-        type: string
-        inputType: password
-      - name: s3-alias-host
-        caption: Host
-        type: string   
-  user:
-    fields:
-      - name: user-name
-        caption: Username
-        type: string
-      - name: user-email
-        caption: Email
-        type: string
-        vtype: email
-      - name: user-role
-        caption: Custom Role
-        type: list
-        values:
-          Owner: Owner
-          Admin: Admin
-          Moderator: Moderator
-
 
 onInstall:
   - setup
@@ -133,90 +81,8 @@ actions:
         cd /root/mastodon
         docker-compose up -d
 
-addons:
-  - id: update-mastodon
-    name: Update Mastodon
-    description: Pull updated docker containers and restart Mastodon.
-    permanent: true
-    buttons:
-      - confirmText: Are you sure you want to proceed?
-        loadingText: Updating Mastodon...
-        action: updateMastodon
-        caption: Update
-        successText: Your Mastodon instance has been updated!
-        title: Update Mastodon
-    actions:
-      updateMastodon:
-        -  cmd[cp]: |-
-            cd /root/mastodon
-            docker-compose pull
-            docker-compose down
-            docker-compose up -d
-  - id: mail-setup
-    name: Mail Setup
-    description: Configure Mastodon's SMTP settings
-    permanent: true
-    buttons:
-      - confirmText: Are you sure you want to proceed?
-        loadingText: Changing Mastodon configuration...
-        action: smtpConfigure
-        caption: Configure
-        successText: Your Mastdon environment has been configured successfully!
-        settings: smtp
-        title: Please enter your SMTP details
-    actions:
-      smtpConfigure:
-        - cmd[cp]: |-
-            cd /root/mastodon
-            sed -i \
-            -e "s|SMTP_SERVER=.*|SMTP_SERVER=${settings.smtp-server}|" \
-            -e "s|SMTP_PORT=.*|SMTP_PORT=${settings.smtp-port}|" \
-            -e "s|SMTP_LOGIN=.*|SMTP_LOGIN=${settings.smtp-login}|" \
-            -e "s|SMTP_PASSWORD=.*|SMTP_PASSWORD=${settings.smtp-password}|" \
-            -e "s|SMTP_FROM_ADDRESS=.*|SMTP_FROM_ADDRESS=${settings.smtp-from}|" \
-            .env
-            docker-compose up -d --force-recreate
-  - id: s3-setup
-    name: S3 Setup
-    description: Configure S3 Storage
-    permanent: true
-    buttons:
-      - confirmText: Are you sure you want to proceed?
-        loadingText: Changing Mastodon configuration...
-        action: s3Configure
-        caption: Configure
-        successText: Your Mastdon environment has been configured successfully!
-        settings: s3
-        title: Please enter your S3 details
-    actions:
-      s3Configure:
-        - cmd[cp]: |-
-            cd /root/mastodon
-            sed -i \
-            -e "s|S3_ENABLED=.*|S3_ENABLED=true|" \
-            -e "s|S3_BUCKET=.*|S3_BUCKET=${settings.s3-bucket}|" \
-            -e "s|AWS_ACCESS_KEY_ID=.*|AWS_ACCESS_KEY_ID=${settings.aws-access-key-id}|" \
-            -e "s|AWS_SECRET_ACCESS_KEY=.*|AWS_SECRET_ACCESS_KEY=${settings.aws-secret-access-key}|" \
-            -e "s|S3_ALIAS_HOST=.*|S3_ALIAS_HOST=${settings.s3-alias-host}|" \
-            .env
-            docker-compose up -d --force-recreate
-  - id: create-user
-    name: Create User
-    description: Create a user via tootctl.
-    permanent: true
-    buttons:
-      - confirmText: Are you sure you want to proceed?
-        loadingText: Creating User...
-        action: Create
-        caption: Create
-        successText: Your Mastodon instance has been updated!
-        settings: user
-        title: Create User
-    actions:
-      createuser:
-        -  cmd[cp]: |-
-            TEMP_PASSWORD=`tootctl accounts create ${settings.user-name} --email=${settings.user-email} --confirmed --role ${settings.user-role} | awk '{ print $3 }'`
-
 success: | 
-  - Set up an owner account, configure SMTP for Mail, and set up S3 for media storage using the add-ons for your Mastodon server node. 
+  Mastodon is ready!
+  - Set up an owner account by using at the `tootctl` at the command line: `tootctl accounts create USERNAME --email=EMAIL@EMAIL.COM --confirmed --role owner`
+  - You can configure SMTP for Mail, and set up S3 for media storage by editing the file at `/root/mastodon/.env`
   - If you are mapping a custom domain, point an A record at **${nodes.cp.extIPs}**.
