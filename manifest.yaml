@@ -3,7 +3,7 @@ id: mastodon-docker
 version: '1.0'
 appVersion: latest
 name: Mastodon
-baseUrl: https://raw.githubusercontent.com/TaylorJadin/masotodon-docker-jps/main/
+baseUrl: https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main
 logo: /mastodon.png
 homepage: https://joinmastodon.org/
 
