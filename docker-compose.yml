@@ -9,6 +9,9 @@ services:
       - TZ=UTC
       - LOCAL_DOMAIN=${DOMAIN}
       - SINGLE_USER_MODE=${SINGLE_USER_MODE}
+      - WEB_CONCURRENCY=${WEB_CONCURRENCY}
+      - MAX_THREADS=${MAX_THREADS}
+      - DB_POOL=${DB_POOL}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - DB_HOST=${DATABASE_HOST}
