@@ -83,6 +83,6 @@ actions:
 
 success: | 
   Mastodon is ready!
-  - Set up an owner account by using at the `tootctl` at the command line: `tootctl accounts create USERNAME --email=EMAIL@EMAIL.COM --confirmed --role owner`
+  - Set up an owner account by using at the tootctl at the command line: `tootctl accounts create USERNAME --email=EMAIL@EMAIL.COM --confirmed --role Owner`
   - You can configure SMTP for Mail, and set up S3 for media storage by editing the file at `/root/mastodon/.env`
   - If you are mapping a custom domain, point an A record at **${nodes.cp.extIPs}**.
