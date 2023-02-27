@@ -67,9 +67,11 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis
+    image: redis:alpine
     container_name: redis
     restart: unless-stopped
+    volumes:
+    - ./redis:/data
 
   nginx-proxy:
     build: https://raw.githubusercontent.com/TaylorJadin/mastodon-docker-jps/main/Dockerfile
