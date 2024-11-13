@@ -65,7 +65,7 @@ actions:
         -e "/VAPID/d" \
         .env
         docker run --rm -w /app/www --entrypoint rake lscr.io/linuxserver/mastodon mastodon:webpush:generate_vapid_key >> .env
-        docker run --rm -it --entrypoint /bin/bash lscr.io/linuxserver/mastodon:latest generate-active-record | tail -n 3 >> .env
+        docker run --rm --entrypoint /bin/bash lscr.io/linuxserver/mastodon:latest generate-active-record | tail -n 3 >> .env
         echo "alias tootctl='docker exec -it -w /app/www mastodon bin/tootctl'" >> ~/.bashrc
     - env.file.AddFavorite:
         nodeGroup: cp
